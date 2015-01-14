@@ -1,0 +1,225 @@
+<!doctype html>
+<html>
+<meta charset= "UTF-8">
+
+<body>
+
+
+
+<head> 
+	<title> Pigment </title>
+	<script type="text/javascript" src="http://mbostock.github.com/d3/d3.js"></script>
+    <script type="text/javascript" src="http://code.jquery.com/jquery-1.6.2.min.js"></script> 
+    <script type="text/javascript" src="jquery.tipsy.js"></script>
+    <link href="tipsy.css" rel="stylesheet" type="text/css" />
+</head>
+
+<h1> Pigments </h1>
+		<!-- <div> 
+			<p> Pigment: <span id="pigment"></span></p>
+			<p> Description: <span id="descr"></span></p>
+			<p> Toxicity: <span id="tox"></span></p>
+			<p> Oil Absorption: <span id="oila"></span></p>
+		</div>
+		-->
+
+<style>
+	body {  width:960px;
+			margin:auto;
+		    margin-top: 60px;
+			background-color: #d0dcde;
+
+		}
+
+	svg {
+
+		
+		transition: all 500ms cubic-bezier(0.190, 1, .22, 1);
+		transform: translateY(0) scale(.95,.95);
+	}
+
+	svg:hover {
+		box-shadow: 0 11px 18px rgba(0,0,0,.1);
+		transform: translateY(-5px) scale(1,1);
+	}
+
+	h1 { background-color: white;
+		 opacity: 1;
+		 color:  black;
+		 font-family: 'Times New Roman';
+		 font-weight: lighter;
+		 font-size: 70px;
+		 padding: 15px;
+		 height:100px;
+		 box-shadow: 0 5px 8px rgba(0,0,0,.2);
+
+		}
+
+	h2 { background-color: none;
+		 opacity: .6;
+		 color:  #527D91;
+		 font-family: 'Times New Roman';
+		 font-weight: lighter;
+		 width: 300px;
+		
+		 
+		}
+
+	div {
+		float: right;
+		padding: 15px;
+		width: 330px;
+		margin-right: 330px;
+		margin-top:40px;
+		height:120px;
+		
+		
+		color: #527D91;
+		opacity: .5;
+		}
+
+	p {
+		color:black;
+	}
+
+	span {
+		color: #527D91;
+	}
+
+</style>
+
+
+<script  type="text/javascript">
+
+var palette = function(file,color){
+
+ d3.json(file, function(data){
+
+ 	//constants 
+ 	var width = 250;
+ 	var height = 250;
+
+ 	var canvas = d3.select("body")
+ 				.append("svg")
+ 				.attr("width", width)
+ 				.attr("height", height);
+
+ 	var xspace = function(d,i){return (i%15)*50 ;}
+ 	var yspace = function(d,i){return (i/10)*110 +50;}
+
+ 	var theta = 2 * Math.PI / data.length;
+
+ 	var circ = canvas.append("circle")
+ 			.attr("cx", 110)
+ 			.attr("cy", 110)
+ 			.attr("r", 80)
+ 			.attr("fill", color);
+
+ 	/*var text = canvas.append("text")
+ 			.attr("x", 55)
+ 			.attr("y", 120)
+ 			.text("Yellow")
+ 			.attr("opacity",1)
+ 			.attr("font-family", "myriad")
+            .attr("font-size", "40px")
+ 			.attr("fill", "white"); */
+
+ 	
+ 	
+
+ 	var dots = canvas.selectAll("dots")
+ 				.data(data)
+ 				.enter()
+ 				.append("circle")
+ 					.attr('cx', function(d, i) { return (90 * Math.cos(i * theta)) + 110; })
+  					.attr('cy', function(d, i) { return (90 * Math.sin(i * theta)) + 110; })
+ 					.attr("r", 1)
+ 					.attr("stroke", "white")
+ 					.attr("stroke-weight", function(d,i) { 
+ 						if (d.light_fastness == "I") {return 1;}
+ 						else if (d.light_fastness == "II") {return 3;}
+ 						else if (d.light_fastness == "III") {return 5;}
+ 						else {return 0;}; })
+ 					.attr("opacity", function(d,i){ if (d.opacity != "-"){return 1/parseInt(d.opacity);} else {return .5;};})
+ 					.attr("fill", "white")
+ 					.attr("class", "dotring")
+ 					.attr("id", function(d) {return d.common_name;})
+
+ 	var dotring = canvas.selectAll("dotring")
+ 				.data(data)
+ 				.enter()
+ 				.append("svg:circle")
+ 					.attr('cx', function(d, i) { return (100 * Math.cos(i * theta)) + 110; })
+  					.attr('cy', function(d, i) { return (100 * Math.sin(i * theta)) + 110; })
+ 					.attr("r", 1)
+ 					.attr("fill", function(d,i) { 
+ 						if (d.toxicity == "A") {return "#60d692";}
+ 						else if (d.toxicity == "B") {return "orange";}
+ 						else if (d.toxicity == "C") {return "red";}
+ 						else {return "grey";};  });
+ 					
+ 	dots.on("mouseover", function (d){
+ 		
+
+ 		d3.select("#pigment").append("text")
+ 			.text(d.common_name)
+ 			.attr("opacity", 0)
+ 			.transition()
+ 				.duration(8000)
+ 				.ease("linear")
+ 				.atrr("opacity", 1);
+ 		d3.select("#descr").append("text")
+ 			.text(d.description);
+ 		d3.select("#tox").append("text")
+ 			.text(d.toxicity);
+ 		d3.select("#oila").append("text")
+ 			.text(d.oil_absorption);
+
+ 		}
+ 	)
+
+
+
+ 	}); }
+	
+	palette("pigments.json", "#474747");
+
+	palette("pigments.json", "#ededed");
+
+	palette("pigments.json", "#dad0c1");
+
+	palette("pigments.json", "#fff4b5");
+
+	palette("pigments.json", "#ffd093");
+
+	palette("pigments.json", "#fd9982");
+
+	palette("pigments.json", "#cbe6ad");
+
+	palette("pigments.json", "#9be4f3");
+
+	palette("pigments.json", "#cb9bf3");
+
+
+	
+	
+
+
+ 	/*var labels = canvas.selectAll("text")
+ 					.data(data)
+ 					.enter()
+ 					.append("text")
+ 						.attr("x", function(d, i) { return (90 * Math.cos(i * theta)) + 110; } )
+ 						.attr("y", function(d, i) { return (90 * Math.sin(i * theta)) + 110; } )
+ 						.attr("class","node-labels")
+						.text(function(d) {return d.common_name;})
+						.attr("font-size", 8)
+						.attr("fill", "grey")
+						.attr("font-family", 'Futura'); */
+
+
+
+ 
+
+ </script>
+
